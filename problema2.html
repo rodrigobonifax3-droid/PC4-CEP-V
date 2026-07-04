@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC4 · Control Estadístico de Procesos — Gustavo Bonifaz Castro</title>
+<style>
+  :root{
+    --bg:#090d13;
+    --card:#0f1a2e;
+    --border:#1e3355;
+    --text:#dde3ec;
+    --text-sec:#8b949e;
+    --green:#56d364;
+    --red:#ff9270;
+    --blue:#58a6ff;
+    --purple:#d2a8ff;
+    --orange:#e3b341;
+    --guinda:#6E1E2C;
+    --crema:#F0E4C8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    line-height:1.6;
+  }
+  .uni-strip{
+    background:var(--guinda);
+    color:var(--crema);
+    text-align:center;
+    font-size:0.78rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    padding:7px 10px;
+    font-weight:600;
+  }
+  header.portada{
+    padding:56px 24px 40px;
+    text-align:center;
+    border-bottom:1px solid var(--border);
+    background:
+      radial-gradient(ellipse at top, rgba(110,30,42,0.18), transparent 60%),
+      var(--bg);
+  }
+  header.portada h1{
+    font-size:2.1rem;
+    margin:0 0 10px;
+    color:var(--text);
+    max-width:820px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+  header.portada .subtitle{
+    color:var(--blue);
+    font-size:1.05rem;
+    font-weight:600;
+    margin-bottom:26px;
+  }
+  .meta-row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:12px;
+  }
+  .meta-chip{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:8px 18px;
+    font-size:0.85rem;
+    color:var(--text-sec);
+  }
+  .meta-chip b{color:var(--text);}
+  main{
+    max-width:1080px;
+    margin:0 auto;
+    padding:10px 24px 60px;
+  }
+  section{
+    margin-top:46px;
+  }
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    margin-bottom:18px;
+    border-bottom:1px solid var(--border);
+    padding-bottom:10px;
+  }
+  .section-num{
+    color:var(--guinda);
+    background:var(--crema);
+    font-weight:700;
+    font-size:0.78rem;
+    border-radius:6px;
+    padding:3px 9px;
+  }
+  .section-head h2{
+    font-size:1.3rem;
+    margin:0;
+    color:var(--text);
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:22px 24px;
+  }
+  p{color:var(--text);}
+  .note{
+    color:var(--text-sec);
+    font-size:0.82rem;
+    font-style:italic;
+    margin-top:10px;
+  }
+  /* Ficha técnica - identificación */
+  .ficha-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+    gap:10px;
+    margin-top:18px;
+  }
+  .ficha-item{
+    background:#0a1524;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px 10px;
+    text-align:center;
+  }
+  .ficha-item .label{
+    font-size:0.72rem;
+    color:var(--text-sec);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .ficha-item .value{
+    font-size:1.15rem;
+    font-weight:700;
+    margin-top:4px;
+  }
+  .ficha-item.lcs .value, .ficha-item.lci .value{color:var(--red);}
+  .ficha-item.z2 .value{color:var(--orange);}
+  .ficha-item.z1 .value{color:var(--text);}
+  .ficha-item.cl .value{color:var(--green);}
+  /* tablas */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.88rem;
+  }
+  thead th{
+    background:#0a1524;
+    color:var(--blue);
+    text-align:left;
+    padding:9px 10px;
+    border-bottom:1px solid var(--border);
+  }
+  tbody td{
+    padding:7px 10px;
+    border-bottom:1px solid var(--border);
+    color:var(--text);
+  }
+  tbody tr:nth-child(even){background:rgba(255,255,255,0.02);}
+  .table-scroll{max-height:420px; overflow-y:auto; border:1px solid var(--border); border-radius:10px;}
+  .table-scroll table{font-size:0.85rem;}
+  .table-scroll thead th{position:sticky; top:0;}
+  /* desarrollo excel/minitab */
+  .tool-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:22px;
+  }
+  @media (max-width:760px){ .tool-grid{grid-template-columns:1fr;} }
+  .tool-col h3{
+    margin:0 0 12px;
+    font-size:1rem;
+    color:var(--purple);
+  }
+  .tool-col img{
+    width:100%;
+    border:2px solid #1e3a6e;
+    border-radius:8px;
+    box-shadow:0 4px 18px rgba(0,0,0,0.35);
+    margin-bottom:14px;
+    background:#fff;
+  }
+  .calc-summary{margin-top:24px;}
+  /* conclusiones */
+  .conc-list{list-style:none; padding:0; margin:0;}
+  .conc-list li{
+    display:flex;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .conc-list li:last-child{border-bottom:none;}
+  .conc-icon{font-size:1.05rem; flex-shrink:0;}
+  .icon-ok{color:var(--green);}
+  .icon-warn{color:var(--orange);}
+  .icon-info{color:var(--blue);}
+  /* recomendaciones */
+  .reco-main{
+    background:linear-gradient(135deg, rgba(110,30,42,0.35), rgba(15,26,46,1));
+    border:1px solid var(--guinda);
+    border-radius:12px;
+    padding:22px 24px;
+    margin-bottom:20px;
+  }
+  .reco-main .tag{
+    display:inline-block;
+    background:var(--guinda);
+    color:var(--crema);
+    font-size:0.72rem;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    border-radius:999px;
+    padding:4px 12px;
+    margin-bottom:10px;
+  }
+  .reco-cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px;
+  }
+  .reco-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px 18px;
+  }
+  .reco-card h4{
+    margin:0 0 8px;
+    font-size:0.95rem;
+    color:var(--blue);
+  }
+  .reco-card p{
+    margin:0;
+    font-size:0.85rem;
+    color:var(--text-sec);
+  }
+  footer{
+    text-align:center;
+    padding:30px 20px 40px;
+    color:var(--text-sec);
+    font-size:0.85rem;
+    border-top:1px solid var(--border);
+    margin-top:50px;
+  }
+  footer b{color:var(--crema);}
+</style>
+</head>
+<body>
+
+<div class="uni-strip">Universidad Nacional de Ingeniería · Control Estadístico de Procesos</div>
+
+<header class="portada">
+  <h1>Control Estadístico de la Temperatura en el Proceso de Esterilización (Autoclave)</h1>
+  <div class="subtitle">Carta de Individuales y Rango Móvil (I-MR) — PC4</div>
+  <div class="meta-row">
+    <div class="meta-chip">Elaborado por: <b>Gustavo Bonifaz Castro</b></div>
+    <div class="meta-chip">Curso: <b>Control Estadístico de Procesos</b></div>
+    <div class="meta-chip">Herramientas: <b>Excel + Minitab Assistant</b></div>
+  </div>
+</header>
+
+<main>
+
+  <section id="contexto">
+    <div class="section-head"><span class="section-num">01</span><h2>Contexto empresarial</h2></div>
+    <div class="card">
+      <p>Una planta de conservas alimenticias esteriliza sus lotes de producto en un autoclave (retort), donde la temperatura debe mantenerse alrededor del valor de referencia de esterilización (121 °C) durante cada ciclo. Un proceso demasiado frío compromete la inocuidad del producto (esterilización insuficiente), mientras que un exceso de temperatura eleva el consumo energético y puede afectar la calidad sensorial del alimento.</p>
+      <p>Para vigilar esta variable crítica, se registró la temperatura de 24 ciclos consecutivos de esterilización. Como cada ciclo produce una única lectura de temperatura (no se toman múltiples mediciones por lote), el control se realiza mediante una Carta de Individuales y Rango Móvil (I-MR), con el objetivo de verificar si el proceso se mantiene bajo control estadístico.</p>
+      <p class="note">Nota: contexto empresarial ilustrativo, construido a partir del rango de temperatura reportado (~121 °C, valor de referencia típico de esterilización por autoclave). Ajústalo si tu caso real corresponde a otro proceso.</p>
+    </div>
+  </section>
+
+  <section id="identificacion">
+    <div class="section-head"><span class="section-num">02</span><h2>Definición del problema / Identificación de la carta</h2></div>
+    <div class="card">
+      <p>Los datos corresponden a mediciones individuales de temperatura tomadas de forma secuencial, una por cada ciclo de esterilización, sin conformar subgrupos de tamaño n&gt;1. Por ello, la herramienta estadística adecuada es la <b>Carta de Individuales y Rango Móvil (I-MR)</b>, empleada precisamente cuando no es posible o práctico agrupar mediciones en subgrupos —como en procesos donde cada observación representa un lote o ciclo completo—, y donde la variabilidad de corto plazo se estima a partir del rango móvil entre observaciones consecutivas.</p>
+
+      <div class="ficha-grid">
+        <div class="ficha-item lcs"><div class="label">LCS</div><div class="value">132.99 °C</div></div>
+        <div class="ficha-item z2"><div class="label">+2σ</div><div class="value">131.03 °C</div></div>
+        <div class="ficha-item z1"><div class="label">+1σ</div><div class="value">129.07 °C</div></div>
+        <div class="ficha-item cl"><div class="label">X̄ (LC)</div><div class="value">127.12 °C</div></div>
+        <div class="ficha-item z1"><div class="label">-1σ</div><div class="value">125.16 °C</div></div>
+        <div class="ficha-item z2"><div class="label">-2σ</div><div class="value">123.20 °C</div></div>
+        <div class="ficha-item lci"><div class="label">LCI</div><div class="value">121.24 °C</div></div>
+      </div>
+      <p class="note">Límites calculados como X̄ ± 2.66·MR̄ (n=1, d₂=1.128); zonas ±1σ y ±2σ referenciales para las reglas de Nelson/Western Electric.</p>
+    </div>
+  </section>
+
+  <section id="datos">
+    <div class="section-head"><span class="section-num">03</span><h2>Datos</h2></div>
+    <div class="card">
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Ciclo</th><th>Temperatura (°C)</th><th>Rango Móvil</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>125.1</td><td>—</td></tr>
+          <tr><td>2</td><td>127.5</td><td>2.4</td></tr>
+          <tr><td>3</td><td>122.7</td><td>4.8</td></tr>
+          <tr><td>4</td><td>126.4</td><td>3.7</td></tr>
+          <tr><td>5</td><td>125.5</td><td>0.9</td></tr>
+          <tr><td>6</td><td>130.5</td><td>5.0</td></tr>
+          <tr><td>7</td><td>127.3</td><td>3.2</td></tr>
+          <tr><td>8</td><td>127.5</td><td>0.2</td></tr>
+          <tr><td>9</td><td>127.3</td><td>0.2</td></tr>
+          <tr><td>10</td><td>123.0</td><td>4.3</td></tr>
+          <tr><td>11</td><td>123.5</td><td>0.5</td></tr>
+          <tr><td>12</td><td>128.0</td><td>4.5</td></tr>
+          <tr><td>13</td><td>126.4</td><td>1.6</td></tr>
+          <tr><td>14</td><td>128.3</td><td>1.9</td></tr>
+          <tr><td>15</td><td>129.5</td><td>1.2</td></tr>
+          <tr><td>16</td><td>128.1</td><td>1.4</td></tr>
+          <tr><td>17</td><td>128.5</td><td>0.4</td></tr>
+          <tr><td>18</td><td>125.1</td><td>3.4</td></tr>
+          <tr><td>19</td><td>128.5</td><td>3.4</td></tr>
+          <tr><td>20</td><td>126.3</td><td>2.2</td></tr>
+          <tr><td>21</td><td>126.5</td><td>0.2</td></tr>
+          <tr><td>22</td><td>127.9</td><td>1.4</td></tr>
+          <tr><td>23</td><td>129.5</td><td>1.6</td></tr>
+          <tr><td>24</td><td>131.9</td><td>2.4</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="desarrollo">
+    <div class="section-head"><span class="section-num">04</span><h2>Desarrollo en Excel y Minitab</h2></div>
+    <div class="card">
+      <div class="tool-grid">
+        <div class="tool-col">
+          <h3>Minitab Assistant</h3>
+          <img src="{{IMG_MINITAB_I}}" alt="Carta I de Temperatura - Minitab">
+          <img src="{{IMG_MINITAB_MR}}" alt="Carta de Rango Móvil - Minitab">
+        </div>
+        <div class="tool-col">
+          <h3>Excel</h3>
+          <img src="{{IMG_EXCEL_I}}" alt="Carta I de Temperatura - Excel">
+          <img src="{{IMG_EXCEL_MR}}" alt="Carta de Rango Móvil - Excel">
+        </div>
+      </div>
+
+      <div class="calc-summary">
+        <div class="table-scroll">
+        <table>
+          <thead><tr><th>Parámetro</th><th>Fórmula</th><th>Valor</th></tr></thead>
+          <tbody>
+            <tr><td>X̄ (promedio)</td><td>Σxᵢ / n</td><td>127.12 °C</td></tr>
+            <tr><td>MR̄ (rango móvil medio)</td><td>Σ|xᵢ − xᵢ₋₁| / (n−1)</td><td>2.209 °C</td></tr>
+            <tr><td>LCS (Carta I)</td><td>X̄ + 2.66·MR̄</td><td>132.99 °C</td></tr>
+            <tr><td>LCI (Carta I)</td><td>X̄ − 2.66·MR̄</td><td>121.24 °C</td></tr>
+            <tr><td>LCS (Carta MR)</td><td>3.267·MR̄</td><td>7.216 °C</td></tr>
+            <tr><td>LCI (Carta MR)</td><td>D₃·MR̄ (D₃=0)</td><td>0.00 °C</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="note">Los valores calculados en Excel coinciden con los límites reportados por Minitab Assistant, confirmando consistencia entre ambas herramientas.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="interpretacion">
+    <div class="section-head"><span class="section-num">05</span><h2>Interpretación</h2></div>
+    <div class="card">
+      <p>La Carta I muestra un proceso centrado en X̄ = 127.12 °C, con límites entre LCI = 121.24 °C y LCS = 132.99 °C. Las 24 observaciones se mantienen dentro de estos límites, sin rachas ni patrones de zona A, lo que confirma control estadístico. Sin embargo, los últimos cinco ciclos muestran una tendencia ascendente, y el valor final (131.9 °C) ya supera el límite de advertencia de +2σ (131.03 °C); no es una violación formal, pero amerita seguimiento. La Carta MR corrobora la estabilidad: MR̄ = 2.209 °C, muy por debajo del LCS = 7.216 °C, sin amplitudes atípicas entre ciclos consecutivos.</p>
+    </div>
+  </section>
+
+  <section id="conclusiones">
+    <div class="section-head"><span class="section-num">06</span><h2>Conclusiones</h2></div>
+    <div class="card">
+      <ul class="conc-list">
+        <li><span class="conc-icon icon-ok">✓</span><span>El proceso de temperatura está bajo control estadístico: ninguna observación individual ni ningún rango móvil supera sus límites de control.</span></li>
+        <li><span class="conc-icon icon-ok">✓</span><span>La variabilidad de corto plazo es consistente (MR̄ = 2.209 °C), muy por debajo del LCS de 7.216 °C de la Carta MR.</span></li>
+        <li><span class="conc-icon icon-warn">⚡</span><span>Los últimos cinco ciclos muestran una tendencia ascendente; el valor final se aproxima a la zona de advertencia de +2σ y debe monitorearse en los próximos ciclos.</span></li>
+        <li><span class="conc-icon icon-info">→</span><span>La Carta I-MR es la herramienta correcta dado que los datos son mediciones individuales (n=1), sin conformación de subgrupos.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="recomendaciones">
+    <div class="section-head"><span class="section-num">07</span><h2>Recomendaciones</h2></div>
+    <div class="reco-main">
+      <span class="tag">Recomendación principal</span>
+      <p>Mantener el monitoreo continuo del proceso con la Carta I-MR: el sistema está bajo control, pero la tendencia ascendente reciente debe investigarse antes de que derive en una causa especial.</p>
+    </div>
+    <div class="reco-cards">
+      <div class="reco-card">
+        <h4>Investigar la tendencia</h4>
+        <p>Revisar si hubo cambios de insumo, presión de vapor o carga del autoclave en los últimos 5 ciclos que expliquen el aumento sostenido.</p>
+      </div>
+      <div class="reco-card">
+        <h4>Verificar calibración</h4>
+        <p>Confirmar la calibración del sensor de temperatura del autoclave para descartar una deriva instrumental como causa del alza.</p>
+      </div>
+      <div class="reco-card">
+        <h4>Mantener la frecuencia de muestreo</h4>
+        <p>Continuar registrando la temperatura de cada ciclo; no reducir la frecuencia mientras se observa la tendencia detectada.</p>
+      </div>
+      <div class="reco-card">
+        <h4>Documentar condiciones</h4>
+        <p>Registrar cualquier cambio operativo (lote, producto, ajuste de presión) junto a cada lectura, para facilitar el diagnóstico si aparece un punto fuera de control.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <b>Elaborado por: Gustavo Bonifaz Castro</b><br>
+  Control Estadístico de Procesos · PC4 — Assessment Industrial Analytics Challenge
+</footer>
+
+</body>
+</html>
